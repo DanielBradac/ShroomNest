@@ -36,10 +36,7 @@ fun App() {
     val settingsManager = SettingsManager(context)
     RetrofitInstance.init(settingsManager.getSettings().apiRoot)
 
-    Box(
-        modifier = Modifier
-            .padding(16.dp)
-    ) {
+    Box {
         AppNavigation()
     }
 }

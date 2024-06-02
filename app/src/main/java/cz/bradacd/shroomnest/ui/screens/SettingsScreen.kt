@@ -2,8 +2,6 @@ package cz.bradacd.shroomnest.ui.screens
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
@@ -27,7 +25,7 @@ fun SettingsScreen() {
     val settingsManager = SettingsManager(context)
     var apiRoute by remember { mutableStateOf(settingsManager.getSettings().apiRoot) }
 
-    Column {
+    Column(modifier = Modifier.padding(16.dp)) {
         Headline("Settings")
 
         OutlinedTextField(
