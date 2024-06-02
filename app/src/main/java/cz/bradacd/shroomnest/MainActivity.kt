@@ -4,13 +4,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import cz.bradacd.shroomnest.ui.navigation.AppNavigation
 import cz.bradacd.shroomnest.ui.theme.ShroomNestTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,28 +20,27 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ShroomNestTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    MainPage(
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                App()
             }
         }
     }
 }
 
+
 @Composable
-fun MainPage(modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello",
-        modifier = modifier
-    )
+fun App() {
+    Box(
+        modifier = Modifier
+            .padding(16.dp)
+    ) {
+        AppNavigation()
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     ShroomNestTheme {
-        MainPage()
+        App()
     }
 }
