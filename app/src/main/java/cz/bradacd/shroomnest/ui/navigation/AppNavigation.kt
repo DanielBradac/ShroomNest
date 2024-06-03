@@ -1,5 +1,8 @@
 package cz.bradacd.shroomnest.ui.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -58,7 +61,11 @@ fun AppNavigation() {
         NavHost(
             navController = navController,
             startDestination = Screens.HomeScreen.name,
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier.padding(paddingValues),
+            enterTransition = { slideIntoContainer (AnimatedContentTransitionScope.SlideDirection.Down, tween(500)) },
+            exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Up, tween(500)) },
+            popEnterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Down, tween(500)) },
+            popExitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Up, tween(500)) }
         ) {
             composable(route = Screens.HomeScreen.name) {
                 HomeScreen()

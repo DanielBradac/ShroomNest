@@ -10,6 +10,6 @@ import cz.bradacd.shroomnest.ui.Headline
 @Composable
 fun LightScreen() {
     Column(modifier = Modifier.padding(16.dp)) {
-        Headline("Light")
+        Headline("Light Manager")
     }
 }

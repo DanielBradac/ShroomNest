@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -14,9 +15,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
+    LaunchedEffect(Unit) {
+        viewModel.updateStatus()
+    }
+
     val statusData = viewModel.statusData.collectAsState()
     val errorData = viewModel.error.collectAsState()
-    Column(modifier = Modifier.padding(16.dp)) {
+
+    Column(modifier = Modifier
+        .padding(16.dp)
+    ) {
         Headline("Shroom Nest")
 
         if (statusData.value != null) {

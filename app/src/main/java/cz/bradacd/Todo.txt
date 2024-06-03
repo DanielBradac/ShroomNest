@@ -1,0 +1,3 @@
+// TODO unxpected end of stream chyba? - jde o nějaké nastavení emulatoru
+// TODO udělat update statusu onNavigate? pokud to jde
+// TODO - nice to have - pull to refresh

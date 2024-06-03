@@ -13,22 +13,12 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-// TODO unxpected end of stream chyba?
-// TODO tady to asi předělat na ty fetche, co mám u cocktail mastera, těm flows nerozumím
-// TODO nějaký rozumný error handeling a přidat placeholdery
-// TODo fetchuje se to pokaždé nebo jen na začátku?
-// TODO tlačítko na okamžitý update
-
 class HomeViewModel : ViewModel() {
     private val _statusData: MutableStateFlow<StatusResponse?> = MutableStateFlow(null)
     val statusData: StateFlow<StatusResponse?> = _statusData
 
     private val _error: MutableStateFlow<String> = MutableStateFlow("")
     val error: StateFlow<String> = _error
-
-    init {
-        updateStatus()
-    }
 
     fun updateStatus() {
         _statusData.value = null
