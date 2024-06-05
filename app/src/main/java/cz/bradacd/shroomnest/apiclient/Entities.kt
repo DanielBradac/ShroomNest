@@ -7,3 +7,26 @@ data class StatusResponse(
     @SerializedName("temperature") val temperature: Float? = null,
     @SerializedName("error") val error: String = ""
 )
+
+data class HumiditySettingsResponse(
+    @SerializedName("rangeFrom") val rangeFrom: Float? = null,
+    @SerializedName("rangeTo") val rangeTo: Float? = null,
+    @SerializedName("mode") val mode: String = "",
+    @SerializedName("humidifierOn") val humidifierOn: Boolean? = null,
+    @SerializedName("error") val error: String = ""
+)
+
+data class HumiditySettingsRequest(
+    @SerializedName("rangeFrom") val rangeFrom: Float? = null,
+    @SerializedName("rangeTo") val rangeTo: Float? = null,
+    @SerializedName("mode") val mode: String? = null,
+    @SerializedName("humidifierOn") val humidifierOn: Boolean? = null,
+)
+
+fun String?.getHumidifierModeBoolean(): Boolean? {
+    return when (this) {
+        "auto" -> true
+        "manual" -> false
+        else -> null
+    }
+}

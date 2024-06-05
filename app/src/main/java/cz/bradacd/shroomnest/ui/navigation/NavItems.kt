@@ -1,6 +1,5 @@
 package cz.bradacd.shroomnest.ui.navigation
 
-import android.content.res.Resources
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lightbulb

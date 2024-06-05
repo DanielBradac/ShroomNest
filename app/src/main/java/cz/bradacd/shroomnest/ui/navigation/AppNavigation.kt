@@ -2,8 +2,6 @@ package cz.bradacd.shroomnest.ui.navigation
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -13,7 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -25,6 +23,17 @@ import cz.bradacd.shroomnest.ui.screens.HumidityScreen
 import cz.bradacd.shroomnest.ui.screens.LightScreen
 import cz.bradacd.shroomnest.ui.screens.SettingsScreen
 
+// Function to determine the slide direction
+fun determineSlideDirection(from: NavBackStackEntry?, to: NavBackStackEntry): AnimatedContentTransitionScope.SlideDirection {
+    val screenOrder = enumValues<Screens>().map { it.name }
+    val fromIndex = screenOrder.indexOf(from?.destination?.route)
+    val toIndex = screenOrder.indexOf(to.destination.route)
+    return if (fromIndex < toIndex) {
+        AnimatedContentTransitionScope.SlideDirection.Left
+    } else {
+        AnimatedContentTransitionScope.SlideDirection.Right
+    }
+}
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
@@ -62,10 +71,10 @@ fun AppNavigation() {
             navController = navController,
             startDestination = Screens.HomeScreen.name,
             modifier = Modifier.padding(paddingValues),
-            enterTransition = { slideIntoContainer (AnimatedContentTransitionScope.SlideDirection.Down, tween(500)) },
-            exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Up, tween(500)) },
-            popEnterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Down, tween(500)) },
-            popExitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Up, tween(500)) }
+            enterTransition = { slideIntoContainer(determineSlideDirection(initialState, targetState), tween(500)) },
+            exitTransition = { slideOutOfContainer(determineSlideDirection(initialState, targetState), tween(500)) },
+            popEnterTransition = { slideIntoContainer(determineSlideDirection(initialState, targetState), tween(500)) },
+            popExitTransition = { slideOutOfContainer(determineSlideDirection(initialState, targetState), tween(500)) }
         ) {
             composable(route = Screens.HomeScreen.name) {
                 HomeScreen()
@@ -80,6 +89,5 @@ fun AppNavigation() {
                 SettingsScreen()
             }
         }
-
     }
 }

@@ -1,72 +1,129 @@
 package cz.bradacd.shroomnest.ui.screens
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.RangeSlider
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import cz.bradacd.shroomnest.ui.Headline
+import cz.bradacd.shroomnest.viewmodel.HumiditySettings
+import cz.bradacd.shroomnest.viewmodel.HumidityViewModel
 import kotlin.math.roundToInt
 
 @Composable
-fun HumidityScreen() {
-    var automatic by remember { mutableStateOf(true) }
-    var humidifierOn by remember { mutableStateOf(true) }
-    var humidityRange by remember { mutableStateOf(0f..100f) }
+fun HumidityScreen(viewModel: HumidityViewModel = viewModel()) {
+    val fetchIsLoading by viewModel.fetchIsLoading.collectAsState()
+    val pushIsLoading by viewModel.pushIsLoading.collectAsState()
+    val humiditySettings by viewModel.humiditySettings.collectAsState()
+    val errorData by viewModel.error.collectAsState()
+    val context = LocalContext.current
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        Headline("Humidity Manager")
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Headline("Humidity Manager")
 
+            if (humiditySettings != null) {
+                humiditySettings!!.HumiditySettingsOptions(
+                    onAutomaticChange = { newValue -> viewModel.updateAutomatic(newValue) },
+                    onHumidityRangeChange = { newRange -> viewModel.updateHumidityRange(newRange) },
+                    onHumidifierOnChange = { newValue -> viewModel.updateHumidifierOn(newValue) }
+                )
+            }
+
+            if (fetchIsLoading) {
+                Text(text = "Loading server data...")
+            }
+
+            if (pushIsLoading) {
+                Text(text = "Uploading data...")
+            }
+
+            if (errorData.isNotBlank()) {
+                Text(text = "Error: $errorData")
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+        }
+
+        Column(modifier = Modifier.align(Alignment.BottomStart)) {
+            Button(
+                enabled = !fetchIsLoading && !pushIsLoading && humiditySettings != null,
+                onClick = {
+                    viewModel.pushHumiditySettings(context)
+                }) {
+                Text("Push settings")
+            }
+
+            Button(
+                enabled = !fetchIsLoading && !pushIsLoading,
+                modifier = Modifier.padding(top = 8.dp),
+                onClick = {
+                    viewModel.fetchHumiditySettings()
+                }) {
+                Text("Pull settings")
+            }
+        }
+    }
+}
+
+@Composable
+fun HumiditySettings.HumiditySettingsOptions(
+    onAutomaticChange: (Boolean) -> Unit,
+    onHumidityRangeChange: (ClosedFloatingPointRange<Float>) -> Unit,
+    onHumidifierOnChange: (Boolean) -> Unit
+) {
+    Row {
+        Switch(
+            checked = automatic,
+            onCheckedChange = { onAutomaticChange(it) }
+        )
+        Text(
+            text = if (automatic) "Automatic" else "Manual",
+            modifier = Modifier.padding(top = 10.dp, start = 16.dp)
+        )
+    }
+
+    if (automatic) {
+        RangeSlider(
+            value = humidityRange,
+            steps = 100,
+            onValueChange = { newRange ->
+                onHumidityRangeChange(
+                    newRange.start.roundToInt().toFloat()..newRange.endInclusive.roundToInt().toFloat()
+                )
+            },
+            valueRange = 0f..100f
+        )
+        Text(
+            text = "Humidity range: ${humidityRange.start.toInt()} % - ${humidityRange.endInclusive.toInt()} %"
+        )
+    } else {
         Row {
-            Switch(checked = automatic, onCheckedChange = { automatic = it })
+            Switch(
+                checked = humidifierOn,
+                onCheckedChange = { onHumidifierOnChange(it) }
+            )
             Text(
-                text = if (automatic) "Automatic" else "Manual",
+                text = if (humidifierOn) "Humidifier ON" else "Humidifier OFF",
                 modifier = Modifier.padding(top = 10.dp, start = 16.dp)
             )
         }
-
-        if (automatic) {
-            RangeSlider(
-                value = humidityRange,
-                steps = 100,
-                onValueChange = {
-                    humidityRange =
-                        it.start.roundToInt().toFloat()..it.endInclusive.roundToInt().toFloat()
-                },
-                valueRange = 0f..100f
-            )
-            Text(text = "Humidity range: ${humidityRange.start.toInt()} % - ${humidityRange.endInclusive.toInt()} %")
-
-        } else {
-            Row {
-                Switch(checked = humidifierOn, onCheckedChange = { humidifierOn = it })
-                Text(
-                    text = if (humidifierOn) "Humidifier ON" else "Humidifier OFF",
-                    modifier = Modifier.padding(top = 10.dp, start = 16.dp)
-                )
-            }
-        }
-
-        Button(
-            modifier = Modifier
-                .padding(top = 16.dp),
-            onClick = {
-
-            }) {
-            Text("Upload changes")
-        }
-
     }
 }
