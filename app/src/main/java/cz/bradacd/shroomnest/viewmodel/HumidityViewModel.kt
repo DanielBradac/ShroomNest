@@ -87,11 +87,7 @@ class HumidityViewModel : ViewModel() {
                         _error.value = "Response body couldn't be parsed properly."
                         return
                     }
-
                     _humiditySettings.value = responseData.toSettings()
-                    if (responseData.error.isNotBlank()) {
-                        _error.value = responseData.error
-                    }
                 }
 
                 override fun onFailure(call: Call<HumiditySettingsResponse>, t: Throwable) {
@@ -128,8 +124,12 @@ class HumidityViewModel : ViewModel() {
                 ) {
                     _pushIsLoading.value = false
                     if (!response.isSuccessful) {
-                        _error.value =
-                            "Unable to push humidity settings, check API root setting. Response:\n ${response.raw()}"
+                        _error.value = "Unable to push humidity settings.\n" +
+                                if (response.message().isNotBlank()) {
+                                    "Error message: ${response.message()}"
+                                } else {
+                                    "Raw response: ${response.raw()}"
+                                }
                         return
                     }
 
@@ -138,13 +138,9 @@ class HumidityViewModel : ViewModel() {
                         _error.value = "Response body couldn't be parsed properly."
                         return
                     }
-
                     _humiditySettings.value = responseData.toSettings()
-                    if (responseData.error.isNotBlank()) {
-                        _error.value = responseData.error
-                    } else {
-                        Toast.makeText(context, "Humidity settings uploaded", Toast.LENGTH_SHORT).show()
-                    }
+                    Toast.makeText(context, "Humidity settings uploaded", Toast.LENGTH_SHORT).show()
+
                 }
 
                 override fun onFailure(call: Call<HumiditySettingsResponse>, t: Throwable) {

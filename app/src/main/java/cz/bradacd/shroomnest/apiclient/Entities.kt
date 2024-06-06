@@ -5,7 +5,6 @@ import com.google.gson.annotations.SerializedName
 data class StatusResponse(
     @SerializedName("humudity") val humidity: Float? = null,
     @SerializedName("temperature") val temperature: Float? = null,
-    @SerializedName("error") val error: String = ""
 )
 
 data class HumiditySettingsResponse(
@@ -13,7 +12,6 @@ data class HumiditySettingsResponse(
     @SerializedName("rangeTo") val rangeTo: Float? = null,
     @SerializedName("mode") val mode: String = "",
     @SerializedName("humidifierOn") val humidifierOn: Boolean? = null,
-    @SerializedName("error") val error: String = ""
 )
 
 data class HumiditySettingsRequest(

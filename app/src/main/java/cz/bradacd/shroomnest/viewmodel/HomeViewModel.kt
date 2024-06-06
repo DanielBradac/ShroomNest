@@ -54,11 +54,7 @@ class HomeViewModel : ViewModel() {
                         _error.value = "Response body couldn't be parsed properly."
                         return
                     }
-
                     _statusData.value = responseData
-                    if (responseData.error.isNotBlank()) {
-                        _error.value = responseData.error
-                    }
                 }
 
                 override fun onFailure(call: Call<StatusResponse>, t: Throwable) {

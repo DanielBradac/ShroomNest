@@ -105,9 +105,9 @@ fun HumiditySettings.HumiditySettingsOptions(
             value = humidityRange,
             steps = 100,
             onValueChange = { newRange ->
-                onHumidityRangeChange(
-                    newRange.start.roundToInt().toFloat()..newRange.endInclusive.roundToInt().toFloat()
-                )
+                val start = newRange.start.roundToInt().toFloat()
+                val end = newRange.endInclusive.roundToInt().toFloat()
+                onHumidityRangeChange(start..end)
             },
             valueRange = 0f..100f
         )
