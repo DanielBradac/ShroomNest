@@ -1,4 +1,2 @@
 // TODO landscape mod je fucked
-// TODO ty retrofit cally jsou šílenej boilerplate, chtělo by to nějak zobecnit
 // TODO unxpected end of stream chyba? - jde o nějaké nastavení emulatoru
-// TODO - nice to have - pull to refresh

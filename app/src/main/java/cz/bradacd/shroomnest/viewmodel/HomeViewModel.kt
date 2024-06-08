@@ -4,12 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cz.bradacd.shroomnest.apiclient.RetrofitInstance
 import cz.bradacd.shroomnest.apiclient.StatusResponse
+import cz.bradacd.shroomnest.apiclient.apiCall
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class HomeViewModel : ViewModel() {
     private val _statusData: MutableStateFlow<StatusResponse?> = MutableStateFlow(null)
@@ -30,39 +29,24 @@ class HomeViewModel : ViewModel() {
         _error.value = ""
         _isLoading.value = true
 
-        if (RetrofitInstance.apiService == null) {
-            _error.value = "Retrofit client not initialised"
-            return
-        }
-
         viewModelScope.launch {
-            val call: Call<StatusResponse> = RetrofitInstance.apiService!!.getStatus()
-            call.enqueue(object : Callback<StatusResponse> {
-                override fun onResponse(
-                    call: Call<StatusResponse>,
-                    response: Response<StatusResponse>
-                ) {
+            val call: Call<StatusResponse>? = RetrofitInstance.apiService?.getStatus()
+            apiCall(
+                call,
+                onSuccess = { response ->
                     _isLoading.value = false
-                    if (!response.isSuccessful) {
-                        _error.value =
-                            "Unable to retrieve status, check API root setting. Response:\n ${response.raw()}"
-                        return
-                    }
-
                     val responseData: StatusResponse? = response.body()
-                    if (responseData == null) {
+                    if (responseData != null) {
+                        _statusData.value = responseData
+                    } else {
                         _error.value = "Response body couldn't be parsed properly."
-                        return
                     }
-                    _statusData.value = responseData
-                }
-
-                override fun onFailure(call: Call<StatusResponse>, t: Throwable) {
+                },
+                onError = { error ->
                     _isLoading.value = false
-                    _error.value = t.message ?: "Unknown error"
+                    _error.value = error.message ?: "Unknown error"
                 }
-            })
-
+            )
         }
     }
 }

@@ -15,8 +15,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import cz.bradacd.shroomnest.ui.Headline
 import cz.bradacd.shroomnest.viewmodel.HumiditySettings
@@ -36,6 +41,9 @@ fun HumidityScreen(viewModel: HumidityViewModel = viewModel()) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
+        Column {
+
+        }
         Column(modifier = Modifier.fillMaxSize()) {
             Headline("Humidity Manager")
 
@@ -112,8 +120,22 @@ fun HumiditySettings.HumiditySettingsOptions(
             valueRange = 0f..100f
         )
         Text(
+            modifier = Modifier.padding(bottom = 16.dp),
             text = "Humidity range: ${humidityRange.start.toInt()} % - ${humidityRange.endInclusive.toInt()} %"
         )
+
+        Text(text = buildAnnotatedString {
+            append("Humidifier is: ")
+            withStyle(
+                style = SpanStyle(
+                    fontWeight = FontWeight.Bold,
+                    color = if (humidifierOn) Color.Green else Color.Red
+                ),
+            ) {
+                append(if (humidifierOn) "ON" else "OFF")
+            }
+        })
+
     } else {
         Row {
             Switch(
