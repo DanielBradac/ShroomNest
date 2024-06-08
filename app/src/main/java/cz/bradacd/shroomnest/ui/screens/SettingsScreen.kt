@@ -19,6 +19,7 @@ import cz.bradacd.shroomnest.ui.Headline
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import cz.bradacd.shroomnest.settings.Settings
 
@@ -28,10 +29,13 @@ fun SettingsScreen() {
     val context = LocalContext.current
     val settingsManager = SettingsManager(context)
     var apiRoute by remember { mutableStateOf(settingsManager.getSettings().apiRoot) }
+    val isLandscape =
+        LocalConfiguration.current.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Headline("Settings")
@@ -47,7 +51,7 @@ fun SettingsScreen() {
 
         Button(
             modifier = Modifier
-                .align(Alignment.BottomStart)
+                .align(if (isLandscape) Alignment.BottomEnd else Alignment.BottomStart)
                 .padding(top = 16.dp),
             onClick = {
                 settingsManager.saveSettings(Settings(apiRoute))

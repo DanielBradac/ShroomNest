@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.dp
@@ -35,6 +36,9 @@ fun HumidityScreen(viewModel: HumidityViewModel = viewModel()) {
     val humiditySettings by viewModel.humiditySettings.collectAsState()
     val errorData by viewModel.error.collectAsState()
     val context = LocalContext.current
+    val configuration = LocalConfiguration.current
+    val isLandscape =
+        configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
     Box(
         modifier = Modifier
@@ -70,7 +74,8 @@ fun HumidityScreen(viewModel: HumidityViewModel = viewModel()) {
             Spacer(modifier = Modifier.weight(1f))
         }
 
-        Column(modifier = Modifier.align(Alignment.BottomStart)) {
+
+        Column(modifier = Modifier.align(if (isLandscape) Alignment.BottomEnd else Alignment.BottomStart)) {
             Button(
                 enabled = !fetchIsLoading && !pushIsLoading && humiditySettings != null,
                 onClick = {

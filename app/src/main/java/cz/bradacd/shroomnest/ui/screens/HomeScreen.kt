@@ -12,6 +12,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import cz.bradacd.shroomnest.ui.Headline
 import cz.bradacd.shroomnest.viewmodel.HomeViewModel
@@ -22,10 +24,13 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
     val isLoading by viewModel.isLoading.collectAsState()
     val statusData by viewModel.statusData.collectAsState()
     val errorData by viewModel.error.collectAsState()
+    val isLandscape =
+        LocalConfiguration.current.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxSize()
@@ -50,7 +55,7 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
 
         Button(
             modifier = Modifier
-                .align(Alignment.BottomStart)
+                .align(if (isLandscape) Alignment.BottomEnd else Alignment.BottomStart)
                 .padding(top = 16.dp),
             enabled = !isLoading,
             onClick = {
