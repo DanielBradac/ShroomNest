@@ -14,21 +14,26 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import cz.bradacd.shroomnest.settings.SettingsManager
 import cz.bradacd.shroomnest.ui.Headline
 import androidx.compose.material3.Text
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import cz.bradacd.shroomnest.settings.Settings
+import androidx.lifecycle.viewmodel.compose.viewModel
+import cz.bradacd.shroomnest.viewmodel.Settings
+import cz.bradacd.shroomnest.viewmodel.SettingsViewModel
+import cz.bradacd.shroomnest.viewmodel.getSettings
 
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
     val context = LocalContext.current
-    val settingsManager = SettingsManager(context)
-    var apiRoute by remember { mutableStateOf(settingsManager.getSettings().apiRoot) }
+    var apiRoot by remember { mutableStateOf(getSettings(context).apiRoot) }
+    var humidifierIp by remember { mutableStateOf(getSettings(context).humidifierIp) }
+    val pushIsLoading by viewModel.pushIsLoading.collectAsState()
+    val errorData by viewModel.error.collectAsState()
     val isLandscape =
         LocalConfiguration.current.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
@@ -41,10 +46,24 @@ fun SettingsScreen() {
             Headline("Settings")
 
             OutlinedTextField(
-                value = apiRoute,
-                onValueChange = { apiRoute = it },
+                value = apiRoot,
+                onValueChange = { apiRoot = it },
                 label = { Text("API root") }
             )
+
+            OutlinedTextField(
+                value = humidifierIp,
+                onValueChange = { humidifierIp = it },
+                label = { Text("Humidifier IP") }
+            )
+
+            if (pushIsLoading) {
+                Text(text = "Uploading IP settings to server...")
+            }
+
+            if (errorData.isNotBlank()) {
+                Text(text = "Error: $errorData")
+            }
 
             Spacer(modifier = Modifier.weight(1f))
         }
@@ -54,8 +73,8 @@ fun SettingsScreen() {
                 .align(if (isLandscape) Alignment.BottomEnd else Alignment.BottomStart)
                 .padding(top = 16.dp),
             onClick = {
-                settingsManager.saveSettings(Settings(apiRoute))
-                Toast.makeText(context, "Settings saved", Toast.LENGTH_SHORT).show()
+                viewModel.saveSettings(context, Settings(apiRoot, humidifierIp))
+                Toast.makeText(context, "Settings saved to local storage", Toast.LENGTH_SHORT).show()
             }) {
             Text("Save Settings")
         }

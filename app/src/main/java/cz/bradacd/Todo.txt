@@ -1,2 +1,4 @@
+// TODO upload ip settingu
+// TODO logy na hlavní stránce
+// TODO Tlačítko pro smazání logů na hlavní stránce
 // TODO landscape mod je fucked
-// TODO unxpected end of stream chyba? - jde o nějaké nastavení emulatoru

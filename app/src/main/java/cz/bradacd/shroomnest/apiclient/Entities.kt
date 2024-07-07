@@ -22,6 +22,10 @@ data class HumiditySettingsRequest(
     @SerializedName("humidifierOn") val humidifierOn: Boolean? = null,
 )
 
+data class IPSettingsReqResp(
+    @SerializedName("humidifierIp") val humidifierIp: String? = null,
+)
+
 fun String?.getHumidifierModeBoolean(): Boolean? {
     return when (this) {
         "auto" -> true
