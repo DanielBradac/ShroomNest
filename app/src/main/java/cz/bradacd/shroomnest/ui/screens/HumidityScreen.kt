@@ -45,9 +45,6 @@ fun HumidityScreen(viewModel: HumidityViewModel = viewModel()) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Column {
-
-        }
         Column(modifier = Modifier.fillMaxSize()) {
             Headline("Humidity Manager")
 
@@ -73,7 +70,6 @@ fun HumidityScreen(viewModel: HumidityViewModel = viewModel()) {
 
             Spacer(modifier = Modifier.weight(1f))
         }
-
 
         Column(modifier = Modifier.align(if (isLandscape) Alignment.BottomEnd else Alignment.BottomStart)) {
             Button(

@@ -13,7 +13,6 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import java.util.concurrent.TimeUnit
 
-
 object RetrofitInstance {
     private var baseURL = ""
 
@@ -55,6 +54,12 @@ interface ApiService {
 
     @POST("updateIPSettings")
     fun updateIPSettings(@Body req: IPSettingsReqResp): Call<IPSettingsReqResp>
+
+    @GET("getLogs")
+    fun getLogs(): Call<LogResp>
+
+    @POST("purgeLogs")
+    fun purgeLogs(): Call<LogResp>
 }
 
 fun <T> apiCall(

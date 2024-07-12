@@ -1,4 +1,2 @@
-// TODO upload ip settingu
-// TODO logy na hlavní stránce
-// TODO Tlačítko pro smazání logů na hlavní stránce
+// TODO logy na hlavní stránce - udělat na to nějakou fancy komponentu - sort jak podle času, tak podle severity
 // TODO landscape mod je fucked

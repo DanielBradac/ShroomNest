@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import cz.bradacd.shroomnest.apiclient.HumiditySettingsResponse
 import cz.bradacd.shroomnest.apiclient.IPSettingsReqResp
 import cz.bradacd.shroomnest.apiclient.RetrofitInstance
 import cz.bradacd.shroomnest.apiclient.apiCall
