@@ -1,6 +1,5 @@
 package cz.bradacd.shroomnest.utils
 
-import cz.bradacd.shroomnest.apiclient.LogMessageResp
 import cz.bradacd.shroomnest.apiclient.LogResp
 import java.time.Instant
 import java.time.LocalDateTime
@@ -8,7 +7,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 enum class LogLevel {
-    INFO, WARNING, ERROR
+    ERROR, WARNING, INFO
 }
 
 private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
@@ -33,10 +32,25 @@ fun LogResp.toMessages(): List<LogMessage> {
         LogMessage(LogLevel.ERROR, it.message?:"", it.header?:"", it.timestamp?.toInstant())
     } ?: emptyList()
 
-    return (infos + warnings + errors).sortedBy { it.timestamp }
+    return infos + warnings + errors
+}
+
+fun List<LogMessage>.sorted(sortBySeverity: Boolean): List<LogMessage> {
+    if (sortBySeverity) {
+        return this.sortedWith(compareBy(LogMessage::level, LogMessage::timestamp))
+    }
+    return this.sortedBy { it.timestamp }
 }
 
 fun String.toInstant(): Instant? {
     val localDateTime = LocalDateTime.parse(this, formatter)
     return localDateTime.atZone(ZoneId.systemDefault()).toInstant()
+}
+
+fun Instant?.formatInstant(): String {
+    if (this == null) {
+        return ""
+    }
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault())
+    return formatter.format(this)
 }

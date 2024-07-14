@@ -32,9 +32,16 @@ class HomeViewModel : ViewModel() {
     private val _logIsLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val logIsLoading: StateFlow<Boolean> = _logIsLoading
 
+    private val _sortBySeverity: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    var sortBySeverity: StateFlow<Boolean> = _sortBySeverity
+
     init {
         fetchStatus()
         fetchLog()
+    }
+
+    fun toggleSortMethod(newValue: Boolean) {
+        _sortBySeverity.value = newValue
     }
 
     fun fetchStatus() {

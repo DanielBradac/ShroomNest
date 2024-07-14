@@ -12,7 +12,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
@@ -20,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import cz.bradacd.shroomnest.ui.Headline
 import cz.bradacd.shroomnest.viewmodel.HomeViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import cz.bradacd.shroomnest.ui.LogViewer
+import cz.bradacd.shroomnest.utils.sorted
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
@@ -31,8 +32,15 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
     val logData by viewModel.logData.collectAsState()
     val logError by viewModel.logError.collectAsState()
 
+    val sortBySeverity by viewModel.sortBySeverity.collectAsState()
+
     val isLandscape =
         LocalConfiguration.current.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+
+    if (isLandscape) {
+        Text("Landscape mode not supported")
+        return
+    }
 
     Box(
         modifier = Modifier
@@ -44,21 +52,17 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
         ) {
             Headline("Shroom Nest")
 
-            if (statusData != null) {
-                Text(text = "Temperature: ${statusData?.temperature ?: "Data not found"} °C")
-                Text(text = "Humidity: ${statusData?.humidity ?: "Data not found"} %")
-            }
-
-            if (logData != null) {
-                Text(logData.toString())
+            if (statusIsLoading) {
+                Text(text = "Loading sensor data...")
             }
 
             if (statusError.isNotBlank()) {
                 Text(text = "Status fetch error: $statusError")
             }
 
-            if (statusIsLoading) {
-                Text(text = "Loading sensor data...")
+            if (statusData != null) {
+                Text(text = "Temperature: ${statusData?.temperature ?: "Data not found"} °C")
+                Text(text = "Humidity: ${statusData?.humidity ?: "Data not found"} %")
             }
 
             if (logIsLoading) {
@@ -69,55 +73,63 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
                 Text(text = "Log fetch error: $logError")
             }
 
-            Spacer(modifier = Modifier.weight(1f)) // Spacer to push the content above the buttons
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 16.dp)
-                .align(if (isLandscape) Alignment.BottomEnd else Alignment.BottomStart),
-            horizontalAlignment = Alignment.Start
-        ) {
-            Spacer(modifier = Modifier.weight(1f)) // Spacer to push the buttons to the bottom
-
-            Button(
-                modifier = Modifier
-                    .padding(top = 16.dp),
-                enabled = !statusIsLoading,
-                onClick = {
-                    viewModel.fetchStatus()
-                },
-            ) {
-                Text("Update status")
+            // Scrollable content
+            if (logData != null) {
+                Box(modifier = Modifier.weight(1f)) {
+                    LogViewer(
+                        logData?.sorted(sortBySeverity) ?: emptyList(),
+                        sortBySeverity
+                    ) { newSortBySeverity ->
+                        viewModel.toggleSortMethod(newSortBySeverity)
+                    }
+                }
+            } else {
+                Spacer(modifier = Modifier.weight(1f))
             }
-            Row {
+
+            // Fixed buttons at the bottom
+            Column(
+                modifier = Modifier
+                    .padding(top = 8.dp)
+            ) {
                 Button(
                     modifier = Modifier
                         .padding(top = 8.dp),
-                    enabled = !logIsLoading,
+                    enabled = !statusIsLoading,
                     onClick = {
-                        viewModel.fetchLog()
+                        viewModel.fetchStatus()
                     },
                 ) {
-                    Text("Update log")
+                    Text("Update status")
                 }
-
-                Button(
+                Row(
                     modifier = Modifier
-                        .padding(top = 8.dp, start = 8.dp),
-                    enabled = !logIsLoading,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xffdf0000)
-                    ),
-                    onClick = {
-                        viewModel.purgeLog()
-                    },
+                        .padding(top = 8.dp)
                 ) {
-                    Text("Delete log")
+                    Button(
+                        enabled = !logIsLoading,
+                        onClick = {
+                            viewModel.fetchLog()
+                        },
+                    ) {
+                        Text("Update log")
+                    }
+
+                    Button(
+                        modifier = Modifier
+                            .padding(start = 8.dp),
+                        enabled = !logIsLoading,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFE53935)
+                        ),
+                        onClick = {
+                            viewModel.purgeLog()
+                        },
+                    ) {
+                        Text("Delete log")
+                    }
                 }
             }
-
         }
     }
 }
