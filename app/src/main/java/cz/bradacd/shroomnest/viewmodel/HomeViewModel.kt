@@ -1,5 +1,7 @@
 package cz.bradacd.shroomnest.viewmodel
 
+import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cz.bradacd.shroomnest.apiclient.LogResp
@@ -8,6 +10,9 @@ import cz.bradacd.shroomnest.apiclient.StatusResponse
 import cz.bradacd.shroomnest.apiclient.apiCall
 import cz.bradacd.shroomnest.utils.LogMessage
 import cz.bradacd.shroomnest.utils.toMessages
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -74,8 +79,15 @@ class HomeViewModel : ViewModel() {
         callLogService(RetrofitInstance.apiService?.getLogs())
     }
 
-    fun purgeLog() {
-        callLogService(RetrofitInstance.apiService?.purgeLogs())
+    fun purgeLog(context: Context) {
+        viewModelScope.launch {
+            async {
+                callLogService(RetrofitInstance.apiService?.purgeLogs())
+            }.await()
+            if (logError.value.isBlank()) {
+                Toast.makeText(context, "Logs deleted", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun callLogService(apiCall: Call<LogResp>?) {
@@ -84,6 +96,7 @@ class HomeViewModel : ViewModel() {
         _logIsLoading.value = true
 
         viewModelScope.launch {
+            delay(1000)
             val call: Call<LogResp>? = apiCall
             apiCall(
                 call,

@@ -52,7 +52,8 @@ fun HumidityScreen(viewModel: HumidityViewModel = viewModel()) {
                 humiditySettings!!.HumiditySettingsOptions(
                     onAutomaticChange = { newValue -> viewModel.updateAutomatic(newValue) },
                     onHumidityRangeChange = { newRange -> viewModel.updateHumidityRange(newRange) },
-                    onHumidifierOnChange = { newValue -> viewModel.updateHumidifierOn(newValue) }
+                    onHumidifierOnChange = { newValue -> viewModel.updateHumidifierOn(newValue) },
+                    pushIsLoading = pushIsLoading
                 )
             }
 
@@ -96,12 +97,14 @@ fun HumidityScreen(viewModel: HumidityViewModel = viewModel()) {
 fun HumiditySettings.HumiditySettingsOptions(
     onAutomaticChange: (Boolean) -> Unit,
     onHumidityRangeChange: (ClosedFloatingPointRange<Float>) -> Unit,
-    onHumidifierOnChange: (Boolean) -> Unit
+    onHumidifierOnChange: (Boolean) -> Unit,
+    pushIsLoading: Boolean
 ) {
     Row {
         Switch(
             checked = automatic,
-            onCheckedChange = { onAutomaticChange(it) }
+            onCheckedChange = { onAutomaticChange(it) },
+            enabled = !pushIsLoading
         )
         Text(
             text = if (automatic) "Automatic" else "Manual",
@@ -118,7 +121,8 @@ fun HumiditySettings.HumiditySettingsOptions(
                 val end = newRange.endInclusive.roundToInt().toFloat()
                 onHumidityRangeChange(start..end)
             },
-            valueRange = 0f..100f
+            valueRange = 0f..100f,
+            enabled = !pushIsLoading
         )
         Text(
             modifier = Modifier.padding(bottom = 16.dp),
@@ -141,7 +145,8 @@ fun HumiditySettings.HumiditySettingsOptions(
         Row {
             Switch(
                 checked = humidifierOn,
-                onCheckedChange = { onHumidifierOnChange(it) }
+                onCheckedChange = { onHumidifierOnChange(it) },
+                enabled = !pushIsLoading
             )
             Text(
                 text = if (humidifierOn) "Humidifier ON" else "Humidifier OFF",

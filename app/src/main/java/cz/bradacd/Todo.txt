@@ -1,2 +1,2 @@
-// TODO logy na hlavní stránce - udělat na to nějakou fancy komponentu - sort jak podle času, tak podle severity
+// TODO night mode - logy nejsou vidět
 // TODO landscape mod je fucked

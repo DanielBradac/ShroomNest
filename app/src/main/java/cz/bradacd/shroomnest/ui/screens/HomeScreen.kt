@@ -6,24 +6,35 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Thermostat
+import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cz.bradacd.shroomnest.ui.Headline
 import cz.bradacd.shroomnest.viewmodel.HomeViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import cz.bradacd.shroomnest.apiclient.StatusResponse
 import cz.bradacd.shroomnest.ui.LogViewer
 import cz.bradacd.shroomnest.utils.sorted
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
+    val context = LocalContext.current
+
     val statusIsLoading by viewModel.statusIsLoading.collectAsState()
     val statusData by viewModel.statusData.collectAsState()
     val statusError by viewModel.statusError.collectAsState()
@@ -61,8 +72,7 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
             }
 
             if (statusData != null) {
-                Text(text = "Temperature: ${statusData?.temperature ?: "Data not found"} °C")
-                Text(text = "Humidity: ${statusData?.humidity ?: "Data not found"} %")
+                StatusInfo(statusData = statusData)
             }
 
             if (logIsLoading) {
@@ -74,7 +84,7 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
             }
 
             // Scrollable content
-            if (logData != null) {
+            if (!logData.isNullOrEmpty()) {
                 Box(modifier = Modifier.weight(1f)) {
                     LogViewer(
                         logData?.sorted(sortBySeverity) ?: emptyList(),
@@ -123,13 +133,39 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
                             containerColor = Color(0xFFE53935)
                         ),
                         onClick = {
-                            viewModel.purgeLog()
+                            viewModel.purgeLog(context)
                         },
                     ) {
                         Text("Delete log")
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun StatusInfo(statusData: StatusResponse?) {
+    Column {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(imageVector = Icons.Default.Thermostat, contentDescription = "Temperature Icon")
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(fontSize = 20.sp, text = "Temperature:", modifier = Modifier.weight(1.1f))
+            Text(
+                fontSize = 20.sp,
+                text = "${statusData?.temperature ?: "Data not found"} °C",
+                modifier = Modifier.weight(1f)
+            )
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(imageVector = Icons.Default.WaterDrop, contentDescription = "Humidity Icon")
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(fontSize = 20.sp, text = "Humidity:", modifier = Modifier.weight(1.1f))
+            Text(
+                fontSize = 20.sp,
+                text = "${statusData?.humidity ?: "Data not found"} %",
+                modifier = Modifier.weight(1f)
+            )
         }
     }
 }

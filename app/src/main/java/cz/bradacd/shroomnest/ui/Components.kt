@@ -9,10 +9,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -20,6 +24,8 @@ import androidx.compose.ui.unit.sp
 import cz.bradacd.shroomnest.utils.LogLevel
 import cz.bradacd.shroomnest.utils.LogMessage
 import cz.bradacd.shroomnest.utils.formatInstant
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.*
 
 @Composable
 fun Headline(text: String) {
@@ -72,7 +78,14 @@ fun TableRow(logMessage: LogMessage) = logMessage.run {
         Modifier
             .fillMaxWidth()
             .background(color = color)
-            .border(1.dp, color = Color.Black)
+            .drawBehind {
+                val borderSize = 1.dp.toPx()
+                drawRect(
+                    color = Color.Black,
+                    topLeft = Offset(0f, size.height - borderSize),
+                    size = Size(size.width, borderSize)
+                )
+            }
     ) {
         TableCell(text = timestamp.formatInstant(), weight = column1Weight)
         TableCell(headerText = header, text = message, weight = column2Weight)
@@ -85,6 +98,8 @@ fun LogViewer(
     sortBySeverity: Boolean,
     onSortChange: (Boolean) -> Unit
 ) {
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier.padding(top = 8.dp)
@@ -111,12 +126,16 @@ fun LogViewer(
             Switch(
                 checked = sortBySeverity,
                 onCheckedChange = {
-                    onSortChange(it)
+                    coroutineScope.launch {
+                        onSortChange(it)
+                        //listState.scrollToItem(0)
+                        listState.animateScrollToItem(0)
+                    }
                 }
             )
         }
 
-        LazyColumn(modifier = Modifier.padding(top = 8.dp)) {
+        LazyColumn(state = listState, modifier = Modifier.border(1.dp, color = Color.Black)) {
             items(logMessages.size) { rowIndex ->
                 TableRow(logMessages[rowIndex])
             }

@@ -104,7 +104,8 @@ class HumidityViewModel : ViewModel() {
                     val responseData: HumiditySettingsResponse? = response.body()
                     if (responseData != null) {
                         _humiditySettings.value = responseData.toSettings()
-                        Toast.makeText(context, "Humidity settings uploaded", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Humidity settings uploaded", Toast.LENGTH_SHORT)
+                            .show()
                     } else {
                         _error.value = "Response body couldn't be parsed properly."
                     }
