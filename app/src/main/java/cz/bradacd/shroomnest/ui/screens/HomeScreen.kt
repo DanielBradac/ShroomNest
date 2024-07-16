@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -146,9 +147,10 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
 
 @Composable
 fun StatusInfo(statusData: StatusResponse?) {
+    val primaryColor = MaterialTheme.colorScheme.primary
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(imageVector = Icons.Default.Thermostat, contentDescription = "Temperature Icon")
+            Icon(imageVector = Icons.Default.Thermostat, contentDescription = "Temperature Icon", tint = primaryColor)
             Spacer(modifier = Modifier.width(8.dp))
             Text(fontSize = 20.sp, text = "Temperature:", modifier = Modifier.weight(1.1f))
             Text(
@@ -158,7 +160,7 @@ fun StatusInfo(statusData: StatusResponse?) {
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(imageVector = Icons.Default.WaterDrop, contentDescription = "Humidity Icon")
+            Icon(imageVector = Icons.Default.WaterDrop, contentDescription = "Humidity Icon", tint = primaryColor)
             Spacer(modifier = Modifier.width(8.dp))
             Text(fontSize = 20.sp, text = "Humidity:", modifier = Modifier.weight(1.1f))
             Text(

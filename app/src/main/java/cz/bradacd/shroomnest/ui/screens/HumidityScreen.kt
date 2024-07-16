@@ -149,8 +149,19 @@ fun HumiditySettings.HumiditySettingsOptions(
                 enabled = !pushIsLoading
             )
             Text(
-                text = if (humidifierOn) "Humidifier ON" else "Humidifier OFF",
-                modifier = Modifier.padding(top = 10.dp, start = 16.dp)
+                //text = if (humidifierOn) "Humidifier ON" else "Humidifier OFF",
+                modifier = Modifier.padding(top = 10.dp, start = 16.dp),
+                text = buildAnnotatedString {
+                    append("Humidifier ")
+                    withStyle(
+                        style = SpanStyle(
+                            fontWeight = FontWeight.Bold,
+                            color = if (humidifierOn) Color.Green else Color.Red
+                        ),
+                    ) {
+                        append(if (humidifierOn) "ON" else "OFF")
+                    }
+                }
             )
         }
     }

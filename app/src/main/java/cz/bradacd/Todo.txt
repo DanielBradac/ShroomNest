@@ -1,2 +1,1 @@
-// TODO night mode - logy nejsou vidět
 // TODO landscape mod je fucked

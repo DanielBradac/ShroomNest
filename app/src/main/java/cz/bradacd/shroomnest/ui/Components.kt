@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,11 +30,12 @@ import androidx.compose.runtime.*
 
 @Composable
 fun Headline(text: String) {
+    val primaryColor = MaterialTheme.colorScheme.primary
     Text(
         text = text,
         fontSize = 32.sp,
-        modifier = Modifier
-            .padding(bottom = 32.dp)
+        color = primaryColor,
+        modifier = Modifier.padding(bottom = 16.dp)
     )
 }
 
@@ -51,13 +53,15 @@ fun RowScope.TableCell(
             Text(
                 text = headerText,
                 modifier = Modifier.padding(4.dp),
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
             )
         }
 
         Text(
             modifier = Modifier.padding(4.dp),
-            text = text
+            text = text,
+            color = Color.Black
         )
     }
 }
