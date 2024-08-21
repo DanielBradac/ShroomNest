@@ -27,6 +27,7 @@ import cz.bradacd.shroomnest.utils.LogMessage
 import cz.bradacd.shroomnest.utils.formatInstant
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.*
+import kotlinx.coroutines.delay
 
 @Composable
 fun Headline(text: String) {
@@ -132,7 +133,6 @@ fun LogViewer(
                 onCheckedChange = {
                     coroutineScope.launch {
                         onSortChange(it)
-                        //listState.scrollToItem(0)
                         listState.animateScrollToItem(0)
                     }
                 }

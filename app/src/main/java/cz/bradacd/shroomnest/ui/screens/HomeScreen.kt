@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material.icons.filled.WaterDrop
@@ -60,7 +62,9 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
             .padding(16.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
         ) {
             Headline("Shroom Nest")
 
@@ -150,7 +154,11 @@ fun StatusInfo(statusData: StatusResponse?) {
     val primaryColor = MaterialTheme.colorScheme.primary
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(imageVector = Icons.Default.Thermostat, contentDescription = "Temperature Icon", tint = primaryColor)
+            Icon(
+                imageVector = Icons.Default.Thermostat,
+                contentDescription = "Temperature Icon",
+                tint = primaryColor
+            )
             Spacer(modifier = Modifier.width(8.dp))
             Text(fontSize = 20.sp, text = "Temperature:", modifier = Modifier.weight(1.1f))
             Text(
@@ -160,7 +168,11 @@ fun StatusInfo(statusData: StatusResponse?) {
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(imageVector = Icons.Default.WaterDrop, contentDescription = "Humidity Icon", tint = primaryColor)
+            Icon(
+                imageVector = Icons.Default.WaterDrop,
+                contentDescription = "Humidity Icon",
+                tint = primaryColor
+            )
             Spacer(modifier = Modifier.width(8.dp))
             Text(fontSize = 20.sp, text = "Humidity:", modifier = Modifier.weight(1.1f))
             Text(

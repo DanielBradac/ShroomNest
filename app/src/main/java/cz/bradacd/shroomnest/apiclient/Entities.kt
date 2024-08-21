@@ -14,6 +14,10 @@ data class HumiditySettingsResponse(
     @SerializedName("rangeTo") val rangeTo: Float? = null,
     @SerializedName("mode") val mode: String = "",
     @SerializedName("humidifierOn") val humidifierOn: Boolean? = null,
+    @SerializedName("waitPer") val waitPer: Int? = null,
+    @SerializedName("runPer") val runPer: Int? = null,
+    @SerializedName("waitTime") val waitTime: Int? = null,
+    @SerializedName("runTime") val runTime: Int? = null,
 )
 
 data class HumiditySettingsRequest(
@@ -21,6 +25,8 @@ data class HumiditySettingsRequest(
     @SerializedName("rangeTo") val rangeTo: Float? = null,
     @SerializedName("mode") val mode: String? = null,
     @SerializedName("humidifierOn") val humidifierOn: Boolean? = null,
+    @SerializedName("waitPer") val waitPer: Int? = null,
+    @SerializedName("runPer") val runPer: Int? = null,
 )
 
 data class IPSettingsReqResp(
@@ -38,11 +44,3 @@ data class LogMessageResp(
     @SerializedName("header") val header: String? = null,
     @SerializedName("timestamp") val timestamp: String? = null,
 )
-
-fun String?.getHumidifierModeBoolean(): Boolean? {
-    return when (this) {
-        "auto" -> true
-        "manual" -> false
-        else -> null
-    }
-}

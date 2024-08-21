@@ -4,21 +4,30 @@ import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cz.bradacd.shroomnest.InvalidInputException
 import cz.bradacd.shroomnest.apiclient.HumiditySettingsRequest
 import cz.bradacd.shroomnest.apiclient.HumiditySettingsResponse
 import cz.bradacd.shroomnest.apiclient.RetrofitInstance
-import cz.bradacd.shroomnest.apiclient.getHumidifierModeBoolean
 import cz.bradacd.shroomnest.apiclient.apiCall
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Call
 
+enum class HumiditySettingsMode(val code: String) {
+    Automatic("auto"),
+    Periodic("period"),
+    Manual("manual")
+}
+
 data class HumiditySettings(
-    // true - auto, false - manual
-    var automatic: Boolean,
     var humidifierOn: Boolean,
-    var humidityRange: ClosedFloatingPointRange<Float>
+    var humidityRange: ClosedFloatingPointRange<Float>,
+    var mode: HumiditySettingsMode,
+    var waitPer: Int?,
+    var runPer: Int?,
+    var waitTime: Int,
+    var runTime: Int
 )
 
 class HumidityViewModel : ViewModel() {
@@ -38,9 +47,9 @@ class HumidityViewModel : ViewModel() {
         fetchHumiditySettings()
     }
 
-    fun updateAutomatic(newValue: Boolean) {
+    fun updateMode(newMode: HumiditySettingsMode) {
         _humiditySettings.value?.let {
-            _humiditySettings.value = it.copy(automatic = newValue)
+            _humiditySettings.value = it.copy(mode = newMode)
         }
     }
 
@@ -53,6 +62,18 @@ class HumidityViewModel : ViewModel() {
     fun updateHumidifierOn(newValue: Boolean) {
         _humiditySettings.value?.let {
             _humiditySettings.value = it.copy(humidifierOn = newValue)
+        }
+    }
+
+    fun updateWaitPer(newValue: Int?) {
+        _humiditySettings.value?.let {
+            _humiditySettings.value = it.copy(waitPer = newValue)
+        }
+    }
+
+    fun updateRunPer(newValue: Int?) {
+        _humiditySettings.value?.let {
+            _humiditySettings.value = it.copy(runPer = newValue)
         }
     }
 
@@ -123,22 +144,41 @@ class HumidityViewModel : ViewModel() {
 fun HumiditySettingsResponse.toSettings(): HumiditySettings {
     return HumiditySettings(
         humidifierOn = this.humidifierOn ?: false,
-        automatic = this.mode.getHumidifierModeBoolean() ?: false,
-        humidityRange = ((this.rangeFrom ?: 0f)..(this.rangeTo ?: 0f))
+        humidityRange = ((this.rangeFrom ?: 0f)..(this.rangeTo ?: 0f)),
+        waitPer = this.waitPer ?: 0,
+        runPer = this.runPer ?: 0,
+        waitTime = this.waitTime ?: 0,
+        runTime = this.runTime ?: 0,
+        mode = when(this.mode) {
+            HumiditySettingsMode.Automatic.code -> HumiditySettingsMode.Automatic
+            HumiditySettingsMode.Periodic.code -> HumiditySettingsMode.Periodic
+            HumiditySettingsMode.Manual.code -> HumiditySettingsMode.Manual
+            else -> throw InvalidInputException("Unknown humidifier settings mode ${this.mode}")
+        }
     )
 }
 
 fun HumiditySettings.toRequest(): HumiditySettingsRequest {
-    return if (automatic) {
-        HumiditySettingsRequest(
-            mode = "auto",
-            rangeFrom = humidityRange.start,
-            rangeTo = humidityRange.endInclusive
-        )
-    } else {
-        HumiditySettingsRequest(
-            mode = "manual",
-            humidifierOn = humidifierOn
-        )
+    return when (this.mode) {
+        HumiditySettingsMode.Automatic -> {
+            HumiditySettingsRequest(
+                mode = HumiditySettingsMode.Automatic.code,
+                rangeFrom = this.humidityRange.start,
+                rangeTo = this.humidityRange.endInclusive
+            )
+        }
+        HumiditySettingsMode.Periodic -> {
+            HumiditySettingsRequest(
+                mode = HumiditySettingsMode.Periodic.code,
+                waitPer = this.waitPer ?: 0,
+                runPer = this.runPer ?: 0
+            )
+        }
+        HumiditySettingsMode.Manual -> {
+            HumiditySettingsRequest(
+                mode = HumiditySettingsMode.Manual.code,
+                humidifierOn = this.humidifierOn
+            )
+        }
     }
 }

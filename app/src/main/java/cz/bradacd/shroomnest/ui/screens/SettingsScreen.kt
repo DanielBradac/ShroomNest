@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
@@ -42,10 +44,15 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
             Headline("Settings")
 
             OutlinedTextField(
+                modifier = Modifier.padding(bottom = 8.dp),
                 value = apiRoot,
                 onValueChange = { apiRoot = it },
                 label = { Text("API root") }
@@ -74,7 +81,8 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
                 .padding(top = 16.dp),
             onClick = {
                 viewModel.saveSettings(context, Settings(apiRoot, humidifierIp))
-                Toast.makeText(context, "Settings saved to local storage", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Settings saved to local storage", Toast.LENGTH_SHORT)
+                    .show()
             }) {
             Text("Save Settings")
         }
