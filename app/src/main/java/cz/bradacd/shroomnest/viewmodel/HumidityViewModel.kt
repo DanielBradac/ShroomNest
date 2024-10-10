@@ -141,7 +141,7 @@ class HumidityViewModel : ViewModel() {
 
 }
 
-fun HumiditySettingsResponse.toSettings(): HumiditySettings {
+private fun HumiditySettingsResponse.toSettings(): HumiditySettings {
     return HumiditySettings(
         humidifierOn = this.humidifierOn ?: false,
         humidityRange = ((this.rangeFrom ?: 0f)..(this.rangeTo ?: 0f)),
@@ -158,7 +158,7 @@ fun HumiditySettingsResponse.toSettings(): HumiditySettings {
     )
 }
 
-fun HumiditySettings.toRequest(): HumiditySettingsRequest {
+private fun HumiditySettings.toRequest(): HumiditySettingsRequest {
     return when (this.mode) {
         HumiditySettingsMode.Automatic -> {
             HumiditySettingsRequest(

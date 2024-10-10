@@ -16,7 +16,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,31 +30,29 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
-
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import cz.bradacd.shroomnest.ui.Headline
-import cz.bradacd.shroomnest.viewmodel.HumiditySettings
-import cz.bradacd.shroomnest.viewmodel.HumiditySettingsMode
-import cz.bradacd.shroomnest.viewmodel.HumidityViewModel
-import kotlin.math.roundToInt
+import cz.bradacd.shroomnest.viewmodel.VentilationSettings
+import cz.bradacd.shroomnest.viewmodel.VentilationSettingsMode
+import cz.bradacd.shroomnest.viewmodel.VentilationViewModel
 
 @Composable
-fun HumidityScreen(viewModel: HumidityViewModel = viewModel()) {
+fun VentilationScreen(viewModel: VentilationViewModel = viewModel()) {
     val fetchIsLoading by viewModel.fetchIsLoading.collectAsState()
     val pushIsLoading by viewModel.pushIsLoading.collectAsState()
-    val humiditySettings by viewModel.humiditySettings.collectAsState()
+    val ventilationSettings by viewModel.ventilationSettings.collectAsState()
     val errorData by viewModel.error.collectAsState()
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val isLandscape =
-        configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+        LocalConfiguration.current.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
     Box(
         modifier = Modifier
@@ -65,13 +62,12 @@ fun HumidityScreen(viewModel: HumidityViewModel = viewModel()) {
         Column(modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())) {
-            Headline("Humidity Manager")
+            Headline("Ventilation Manager")
 
-            if (humiditySettings != null) {
-                humiditySettings!!.HumiditySettingsOptions(
+            if (ventilationSettings != null) {
+                ventilationSettings!!.VentilationSettingsOptions(
                     onModeChange = { newValue -> viewModel.updateMode(newValue) },
-                    onHumidityRangeChange = { newRange -> viewModel.updateHumidityRange(newRange) },
-                    onHumidifierOnChange = { newValue -> viewModel.updateHumidifierOn(newValue) },
+                    onFanOnChange = { newValue -> viewModel.updateFanOn(newValue) },
                     onWaitPerChange = { newValue -> viewModel.updateWaitPer(newValue) },
                     onRunPerChange = { newValue -> viewModel.updateRunPer(newValue) },
                     pushIsLoading = pushIsLoading
@@ -95,9 +91,9 @@ fun HumidityScreen(viewModel: HumidityViewModel = viewModel()) {
 
         Column(modifier = Modifier.align(if (isLandscape) Alignment.BottomEnd else Alignment.BottomStart)) {
             Button(
-                enabled = !fetchIsLoading && !pushIsLoading && humiditySettings != null,
+                enabled = !fetchIsLoading && !pushIsLoading && ventilationSettings != null,
                 onClick = {
-                    viewModel.pushHumiditySettings(context)
+                    viewModel.pushVentilationSettings(context)
                 }) {
                 Text("Push settings")
             }
@@ -106,7 +102,7 @@ fun HumidityScreen(viewModel: HumidityViewModel = viewModel()) {
                 enabled = !fetchIsLoading && !pushIsLoading,
                 modifier = Modifier.padding(top = 8.dp),
                 onClick = {
-                    viewModel.fetchHumiditySettings()
+                    viewModel.fetchVentilationSettings()
                 }) {
                 Text("Pull settings")
             }
@@ -115,10 +111,9 @@ fun HumidityScreen(viewModel: HumidityViewModel = viewModel()) {
 }
 
 @Composable
-fun HumiditySettings.HumiditySettingsOptions(
-    onModeChange: (HumiditySettingsMode) -> Unit,
-    onHumidityRangeChange: (ClosedFloatingPointRange<Float>) -> Unit,
-    onHumidifierOnChange: (Boolean) -> Unit,
+fun VentilationSettings.VentilationSettingsOptions(
+    onModeChange: (VentilationSettingsMode) -> Unit,
+    onFanOnChange: (Boolean) -> Unit,
     onWaitPerChange: (Int?) -> Unit,
     onRunPerChange: (Int?) -> Unit,
     pushIsLoading: Boolean
@@ -126,14 +121,7 @@ fun HumiditySettings.HumiditySettingsOptions(
     Column {
         ModeSelector(onModeChange, pushIsLoading)
         when (mode) {
-            HumiditySettingsMode.Automatic -> {
-                AutomaticSettings(
-                    onHumidityRangeChange = onHumidityRangeChange,
-                    pushIsLoading = pushIsLoading
-                )
-            }
-
-            HumiditySettingsMode.Periodic -> {
+            VentilationSettingsMode.Periodic -> {
                 PeriodicSettings(
                     onWaitPerChange = onWaitPerChange,
                     onRunPerChange = onRunPerChange,
@@ -141,9 +129,9 @@ fun HumiditySettings.HumiditySettingsOptions(
                 )
             }
 
-            HumiditySettingsMode.Manual -> {
+            VentilationSettingsMode.Manual -> {
                 ManualSettings(
-                    onHumidifierOnChange = onHumidifierOnChange,
+                    onFanOnChange = onFanOnChange,
                     pushIsLoading = pushIsLoading
                 )
             }
@@ -152,14 +140,14 @@ fun HumiditySettings.HumiditySettingsOptions(
         Text(
             modifier = Modifier.padding(top = 16.dp),
             text = buildAnnotatedString {
-                append("Humidifier is: ")
+                append("Fan is: ")
                 withStyle(
                     style = SpanStyle(
                         fontWeight = FontWeight.Bold,
-                        color = if (humidifierOn) Color.Green else Color.Red
+                        color = if (fanOn) Color.Green else Color.Red
                     ),
                 ) {
-                    append(if (humidifierOn) "ON" else "OFF")
+                    append(if (fanOn) "ON" else "OFF")
                 }
             }
         )
@@ -167,21 +155,21 @@ fun HumiditySettings.HumiditySettingsOptions(
 }
 
 @Composable
-fun HumiditySettings.ManualSettings(
-    onHumidifierOnChange: (Boolean) -> Unit,
+fun VentilationSettings.ManualSettings(
+    onFanOnChange: (Boolean) -> Unit,
     pushIsLoading: Boolean
 ) {
     Row {
         Switch(
-            checked = humidifierOn,
-            onCheckedChange = { onHumidifierOnChange(it) },
+            checked = fanOn,
+            onCheckedChange = { onFanOnChange(it) },
             enabled = !pushIsLoading
         )
     }
 }
 
 @Composable
-fun HumiditySettings.PeriodicSettings(
+fun VentilationSettings.PeriodicSettings(
     onWaitPerChange: (Int?) -> Unit,
     onRunPerChange: (Int?) -> Unit,
     pushIsLoading: Boolean
@@ -230,35 +218,13 @@ fun HumiditySettings.PeriodicSettings(
     )
 }
 
-@Composable
-fun HumiditySettings.AutomaticSettings(
-    onHumidityRangeChange: (ClosedFloatingPointRange<Float>) -> Unit,
-    pushIsLoading: Boolean
-) {
-    RangeSlider(
-        modifier = Modifier.padding(vertical = 8.dp),
-        value = humidityRange,
-        steps = 100,
-        onValueChange = { newRange ->
-            val start = newRange.start.roundToInt().toFloat()
-            val end = newRange.endInclusive.roundToInt().toFloat()
-            onHumidityRangeChange(start..end)
-        },
-        valueRange = 0f..100f,
-        enabled = !pushIsLoading
-    )
-    Text(
-        text = "Humidity range: ${humidityRange.start.toInt()} % - ${humidityRange.endInclusive.toInt()} %"
-    )
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HumiditySettings.ModeSelector(
-    onModeChange: (HumiditySettingsMode) -> Unit,
+fun VentilationSettings.ModeSelector(
+    onModeChange: (VentilationSettingsMode) -> Unit,
     pushIsLoading: Boolean
 ) {
-    val modes = HumiditySettingsMode.entries
+    val modes = VentilationSettingsMode.entries
     var expanded by remember { mutableStateOf(false) }
     var selectedMode by remember { mutableStateOf(mode) }
 
@@ -309,17 +275,17 @@ fun HumiditySettings.ModeSelector(
     }
 }
 
-fun HumiditySettings.getPeriodicInfo(): AnnotatedString {
+fun VentilationSettings.getPeriodicInfo(): AnnotatedString {
     return buildAnnotatedString {
-        append("Humidifier will be turned ")
+        append("Fan will be turned ")
         withStyle(
             style = SpanStyle(fontWeight = FontWeight.Bold)
         ) {
-            append(if (humidifierOn) "OFF" else "ON")
+            append(if (fanOn) "OFF" else "ON")
         }
         append(" in:\n")
 
-        var remainingTime = if (humidifierOn) {
+        var remainingTime = if (fanOn) {
             (runPer ?: 0) - runTime
         } else {
             (waitPer ?: 0) - waitTime

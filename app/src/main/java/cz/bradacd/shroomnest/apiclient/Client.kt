@@ -52,6 +52,12 @@ interface ApiService {
     @POST("updateHumiditySettings")
     fun updateHumiditySettings(@Body req: HumiditySettingsRequest): Call<HumiditySettingsResponse>
 
+    @GET("getVentilationSettings")
+    fun getVentilationSettings(): Call<VentilationSettingsResponse>
+
+    @POST("updateVentilationSettings")
+    fun updateVentilationSettings(@Body req: VentilationSettingsRequest): Call<VentilationSettingsResponse>
+
     @POST("updateIPSettings")
     fun updateIPSettings(@Body req: IPSettingsReqResp): Call<IPSettingsReqResp>
 

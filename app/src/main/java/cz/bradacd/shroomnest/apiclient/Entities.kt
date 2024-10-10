@@ -20,6 +20,22 @@ data class HumiditySettingsResponse(
     @SerializedName("runTime") val runTime: Int? = null,
 )
 
+data class VentilationSettingsRequest(
+    @SerializedName("mode") val mode: String? = null,
+    @SerializedName("fanOn") val fanOn: Boolean? = null,
+    @SerializedName("waitPer") val waitPer: Int? = null,
+    @SerializedName("runPer") val runPer: Int? = null,
+)
+
+data class VentilationSettingsResponse(
+    @SerializedName("mode") val mode: String = "",
+    @SerializedName("fanOn") val fanOn: Boolean? = null,
+    @SerializedName("waitPer") val waitPer: Int? = null,
+    @SerializedName("runPer") val runPer: Int? = null,
+    @SerializedName("waitTime") val waitTime: Int? = null,
+    @SerializedName("runTime") val runTime: Int? = null,
+)
+
 data class HumiditySettingsRequest(
     @SerializedName("rangeFrom") val rangeFrom: Float? = null,
     @SerializedName("rangeTo") val rangeTo: Float? = null,
@@ -31,6 +47,7 @@ data class HumiditySettingsRequest(
 
 data class IPSettingsReqResp(
     @SerializedName("humidifierIp") val humidifierIp: String? = null,
+    @SerializedName("fanIp") val fanIp: String? = null,
 )
 
 data class LogResp(

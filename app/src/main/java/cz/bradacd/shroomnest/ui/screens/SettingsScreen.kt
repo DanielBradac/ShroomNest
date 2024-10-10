@@ -34,6 +34,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
     val context = LocalContext.current
     var apiRoot by remember { mutableStateOf(getSettings(context).apiRoot) }
     var humidifierIp by remember { mutableStateOf(getSettings(context).humidifierIp) }
+    var fanIp by remember { mutableStateOf(getSettings(context).fanIp) }
     val pushIsLoading by viewModel.pushIsLoading.collectAsState()
     val errorData by viewModel.error.collectAsState()
     val isLandscape =
@@ -64,6 +65,12 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
                 label = { Text("Humidifier IP") }
             )
 
+            OutlinedTextField(
+                value = fanIp,
+                onValueChange = { fanIp = it },
+                label = { Text("Fan IP") }
+            )
+
             if (pushIsLoading) {
                 Text(text = "Uploading IP settings to server...")
             }
@@ -80,7 +87,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
                 .align(if (isLandscape) Alignment.BottomEnd else Alignment.BottomStart)
                 .padding(top = 16.dp),
             onClick = {
-                viewModel.saveSettings(context, Settings(apiRoot, humidifierIp))
+                viewModel.saveSettings(context, Settings(apiRoot, humidifierIp, fanIp))
                 Toast.makeText(context, "Settings saved to local storage", Toast.LENGTH_SHORT)
                     .show()
             }) {

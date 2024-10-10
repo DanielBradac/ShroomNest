@@ -16,7 +16,8 @@ import retrofit2.Call
 
 data class Settings(
     @SerializedName("apiRoot") val apiRoot: String,
-    @SerializedName("humidifierIp") val humidifierIp: String
+    @SerializedName("humidifierIp") val humidifierIp: String,
+    @SerializedName("fanIp") val fanIp: String
 )
 
 private val gson = Gson()
@@ -74,6 +75,6 @@ fun getSettings(context: Context): Settings {
     return if (settingsJson != null) {
         gson.fromJson(settingsJson, Settings::class.java)
     } else {
-        Settings("", "")
+        Settings("", "", "")
     }
 }

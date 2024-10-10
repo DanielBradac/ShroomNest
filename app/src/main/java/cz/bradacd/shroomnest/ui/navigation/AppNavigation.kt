@@ -20,7 +20,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import cz.bradacd.shroomnest.ui.screens.HomeScreen
 import cz.bradacd.shroomnest.ui.screens.HumidityScreen
-import cz.bradacd.shroomnest.ui.screens.LightScreen
+import cz.bradacd.shroomnest.ui.screens.VentilationScreen
 import cz.bradacd.shroomnest.ui.screens.SettingsScreen
 
 // Function to determine the slide direction
@@ -82,8 +82,8 @@ fun AppNavigation() {
             composable(route = Screens.HumidityScreen.name) {
                 HumidityScreen()
             }
-            composable(route = Screens.LightScreen.name) {
-                LightScreen()
+            composable(route = Screens.VentilationScreen.name) {
+                VentilationScreen()
             }
             composable(route = Screens.SettingsScreen.name) {
                 SettingsScreen()
