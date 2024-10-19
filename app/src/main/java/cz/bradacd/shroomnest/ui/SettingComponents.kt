@@ -214,7 +214,7 @@ fun PeriodicallyConfigurable.PeriodicSettings(
         enabled = !pushIsLoading,
         label = { Text("Waiting period") },
         keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Decimal
+            keyboardType = KeyboardType.Number
         )
     )
 
@@ -234,7 +234,7 @@ fun PeriodicallyConfigurable.PeriodicSettings(
         enabled = !pushIsLoading,
         label = { Text("Runtime period") },
         keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Decimal
+            keyboardType = KeyboardType.Number
         )
     )
 
