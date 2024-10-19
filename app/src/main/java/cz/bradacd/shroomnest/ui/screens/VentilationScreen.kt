@@ -50,7 +50,6 @@ fun VentilationScreen(viewModel: VentilationViewModel = viewModel()) {
     val ventilationSettings by viewModel.ventilationSettings.collectAsState()
     val errorData by viewModel.error.collectAsState()
     val context = LocalContext.current
-    val configuration = LocalConfiguration.current
     val isLandscape =
         LocalConfiguration.current.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -20,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,6 +35,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import cz.bradacd.shroomnest.apiclient.StatusResponse
 import cz.bradacd.shroomnest.ui.LogViewer
 import cz.bradacd.shroomnest.utils.sorted
+import kotlinx.coroutines.launch
+import kotlin.math.log
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
@@ -47,6 +51,8 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
     val logError by viewModel.logError.collectAsState()
 
     val sortBySeverity by viewModel.sortBySeverity.collectAsState()
+
+    val logListState = rememberLazyListState()
 
     val isLandscape =
         LocalConfiguration.current.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
@@ -93,7 +99,8 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
                 Box(modifier = Modifier.weight(1f)) {
                     LogViewer(
                         logData?.sorted(sortBySeverity) ?: emptyList(),
-                        sortBySeverity
+                        sortBySeverity,
+                        logListState
                     ) { newSortBySeverity ->
                         viewModel.toggleSortMethod(newSortBySeverity)
                     }

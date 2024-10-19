@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -28,6 +29,7 @@ import cz.bradacd.shroomnest.utils.formatInstant
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.*
 import kotlinx.coroutines.delay
+import kotlin.math.log
 
 @Composable
 fun Headline(text: String) {
@@ -101,15 +103,22 @@ fun TableRow(logMessage: LogMessage) = logMessage.run {
 fun LogViewer(
     logMessages: List<LogMessage>,
     sortBySeverity: Boolean,
+    logListState: LazyListState,
     onSortChange: (Boolean) -> Unit
 ) {
-    val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(logMessages.size) {
+        coroutineScope.launch {
+            if (logMessages.isNotEmpty()) {
+                logListState.scrollToItem(logMessages.size - 1)
+            }
+        }
+    }
 
     Column(
         modifier = Modifier.padding(top = 8.dp)
     ) {
-
         Row {
             Text(
                 text = "Log",
@@ -133,13 +142,13 @@ fun LogViewer(
                 onCheckedChange = {
                     coroutineScope.launch {
                         onSortChange(it)
-                        listState.animateScrollToItem(0)
+                        logListState.animateScrollToItem(0)
                     }
                 }
             )
         }
 
-        LazyColumn(state = listState, modifier = Modifier.border(1.dp, color = Color.Black)) {
+        LazyColumn(state = logListState, modifier = Modifier.border(1.dp, color = Color.Black)) {
             items(logMessages.size) { rowIndex ->
                 TableRow(logMessages[rowIndex])
             }
