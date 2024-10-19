@@ -4,6 +4,8 @@ import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cz.bradacd.shroomnest.HumiditySettings
+import cz.bradacd.shroomnest.HumiditySettingsMode
 import cz.bradacd.shroomnest.InvalidInputException
 import cz.bradacd.shroomnest.apiclient.HumiditySettingsRequest
 import cz.bradacd.shroomnest.apiclient.HumiditySettingsResponse
@@ -13,22 +15,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Call
-
-enum class HumiditySettingsMode(val code: String) {
-    Automatic("auto"),
-    Periodic("period"),
-    Manual("manual")
-}
-
-data class HumiditySettings(
-    var humidifierOn: Boolean,
-    var humidityRange: ClosedFloatingPointRange<Float>,
-    var mode: HumiditySettingsMode,
-    var waitPer: Int?,
-    var runPer: Int?,
-    var waitTime: Int,
-    var runTime: Int
-)
 
 class HumidityViewModel : ViewModel() {
     private val _humiditySettings: MutableStateFlow<HumiditySettings?> = MutableStateFlow(null)

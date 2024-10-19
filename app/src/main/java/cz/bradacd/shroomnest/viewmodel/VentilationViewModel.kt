@@ -4,7 +4,10 @@ import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cz.bradacd.shroomnest.HumiditySettingsMode
 import cz.bradacd.shroomnest.InvalidInputException
+import cz.bradacd.shroomnest.VentilationSettings
+import cz.bradacd.shroomnest.VentilationSettingsMode
 import cz.bradacd.shroomnest.apiclient.HumiditySettingsRequest
 import cz.bradacd.shroomnest.apiclient.HumiditySettingsResponse
 import cz.bradacd.shroomnest.apiclient.RetrofitInstance
@@ -15,20 +18,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Call
-
-enum class VentilationSettingsMode(val code: String) {
-    Periodic("period"),
-    Manual("manual")
-}
-
-data class VentilationSettings(
-    var fanOn: Boolean,
-    var mode: VentilationSettingsMode,
-    var waitPer: Int?,
-    var runPer: Int?,
-    var waitTime: Int,
-    var runTime: Int
-)
 
 class VentilationViewModel : ViewModel() {
     private val _ventilationSettings: MutableStateFlow<VentilationSettings?> = MutableStateFlow(null)
