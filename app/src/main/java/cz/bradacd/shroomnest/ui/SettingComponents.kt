@@ -15,6 +15,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -104,6 +105,34 @@ fun ManuallyConfigurable.ManualSettings(
     }
 }
 
+enum class TimeUnit(val multiplier: Int) {
+    Second(1),
+    Minute(60),
+    Hour(3600)
+}
+
+private fun Float.toSeconds(unit: TimeUnit): Int = (this * unit.multiplier).roundToInt()
+
+private fun Int.fromSeconds(unit: TimeUnit): Float {
+    return ((this.toFloat() / unit.multiplier) * 100).roundToInt().toFloat() / 100
+}
+
+private fun Int.secondsToString(unit: TimeUnit): String {
+    val floatValue = fromSeconds(unit)
+    if (floatValue % 1 == 0f) {
+        return floatValue.toInt().toString()
+    }
+    return floatValue.toString()
+}
+
+private fun getInitialTimeUnit(lowerNumber: Int): TimeUnit =
+    when (lowerNumber) {
+        in 0..TimeUnit.Minute.multiplier -> TimeUnit.Second
+        in TimeUnit.Minute.multiplier..TimeUnit.Hour.multiplier -> TimeUnit.Minute
+        else -> TimeUnit.Hour
+    }
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PeriodicallyConfigurable.PeriodicSettings(
     onWaitPerChange: (Int?) -> Unit,
@@ -111,41 +140,101 @@ fun PeriodicallyConfigurable.PeriodicSettings(
     pushIsLoading: Boolean,
     deviceName: String
 ) {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedUnit by remember {
+        mutableStateOf(
+            getInitialTimeUnit(
+                minOf(
+                    waitPer ?: 0,
+                    runPer ?: 0
+                )
+            )
+        )
+    }
+
+    var waitPerText by remember { mutableStateOf(waitPer?.secondsToString(selectedUnit) ?: "") }
+    var runPerText by remember { mutableStateOf(runPer?.secondsToString(selectedUnit) ?: "") }
+
+    ExposedDropdownMenuBox(
+        modifier = Modifier.padding(bottom = 8.dp),
+        expanded = expanded,
+        onExpandedChange = {
+            if (!pushIsLoading) {
+                expanded = !expanded
+            }
+        }
+    ) {
+        OutlinedTextField(
+            label = { Text(text = "Unit") },
+            value = selectedUnit.name,
+            onValueChange = {},
+            readOnly = true,
+            trailingIcon = {
+                if (!pushIsLoading) {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                }
+            },
+            enabled = !pushIsLoading,
+            modifier = Modifier.menuAnchor()
+        )
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            TimeUnit.entries.forEach { item ->
+                DropdownMenuItem(
+                    text = { Text(text = item.name) },
+                    onClick = {
+                        selectedUnit = item
+                        expanded = false
+                        waitPerText = waitPer?.secondsToString(selectedUnit) ?: ""
+                        runPerText = runPer?.secondsToString(selectedUnit) ?: ""
+                    },
+                    enabled = !pushIsLoading
+                )
+            }
+        }
+    }
+
     OutlinedTextField(
         modifier = Modifier.padding(bottom = 8.dp),
-        value = waitPer?.toString() ?: "",
+        value = waitPerText,
         onValueChange = { newValue ->
+            waitPerText = newValue.replace(',', '.')
             if (newValue.isNotBlank()) {
-                val intValue = newValue.toIntOrNull()
-                if (intValue != null) {
-                    onWaitPerChange(intValue)
+                val floatValue = newValue.toFloatOrNull()
+                if (floatValue != null) {
+                    onWaitPerChange(floatValue.toSeconds(selectedUnit))
                 }
             } else {
                 onWaitPerChange(null)
             }
         },
         enabled = !pushIsLoading,
-        label = { Text("Waiting period (seconds)") },
+        label = { Text("Waiting period") },
         keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number
+            keyboardType = KeyboardType.Decimal
         )
     )
+
     OutlinedTextField(
-        value = runPer?.toString() ?: "",
+        value = runPerText,
         onValueChange = { newValue ->
+            runPerText = newValue.replace(',', '.')
             if (newValue.isNotBlank()) {
-                val intValue = newValue.toIntOrNull()
-                if (intValue != null) {
-                    onRunPerChange(intValue)
+                val floatValue = newValue.toFloatOrNull()
+                if (floatValue != null) {
+                    onRunPerChange(floatValue.toSeconds(selectedUnit))
                 }
             } else {
                 onRunPerChange(null)
             }
         },
         enabled = !pushIsLoading,
-        label = { Text("Runtime period (seconds)") },
+        label = { Text("Runtime period") },
         keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number
+            keyboardType = KeyboardType.Decimal
         )
     )
 
