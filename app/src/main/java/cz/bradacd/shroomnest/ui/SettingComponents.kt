@@ -252,7 +252,7 @@ fun PeriodicallyConfigurable.getPeriodicInfo(
         withStyle(
             style = SpanStyle(fontWeight = FontWeight.Bold)
         ) {
-            append(if (deviceOn()) "ON" else "OFF")
+            append(if (deviceOn()) "OFF" else "ON")
         }
         append(" in:\n")
 
