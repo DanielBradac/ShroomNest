@@ -18,6 +18,7 @@ data class HumiditySettingsResponse(
     @SerializedName("runPer") val runPer: Int? = null,
     @SerializedName("waitTime") val waitTime: Int? = null,
     @SerializedName("runTime") val runTime: Int? = null,
+    @SerializedName("runWithFan") val runWithFan: Boolean? = null
 )
 
 data class VentilationSettingsRequest(
@@ -43,6 +44,7 @@ data class HumiditySettingsRequest(
     @SerializedName("humidifierOn") val humidifierOn: Boolean? = null,
     @SerializedName("waitPer") val waitPer: Int? = null,
     @SerializedName("runPer") val runPer: Int? = null,
+    @SerializedName("runWithFan") val runWithFan: Boolean? = null
 )
 
 data class IPSettingsReqResp(

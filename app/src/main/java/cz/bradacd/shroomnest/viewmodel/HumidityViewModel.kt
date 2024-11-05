@@ -63,6 +63,12 @@ class HumidityViewModel : ViewModel() {
         }
     }
 
+    fun updateRunWithFan(newValue: Boolean) {
+        _humiditySettings.value?.let {
+            _humiditySettings.value = it.copy(runWithFan = newValue)
+        }
+    }
+
     fun fetchHumiditySettings() {
         _humiditySettings.value = null
         _error.value = ""
@@ -135,6 +141,7 @@ private fun HumiditySettingsResponse.toSettings(): HumiditySettings {
         runPer = this.runPer ?: 0,
         waitTime = this.waitTime ?: 0,
         runTime = this.runTime ?: 0,
+        runWithFan = this.runWithFan ?: false,
         mode = when(this.mode) {
             HumiditySettingsMode.Automatic.code -> HumiditySettingsMode.Automatic
             HumiditySettingsMode.Periodic.code -> HumiditySettingsMode.Periodic
@@ -150,14 +157,16 @@ private fun HumiditySettings.toRequest(): HumiditySettingsRequest {
             HumiditySettingsRequest(
                 mode = HumiditySettingsMode.Automatic.code,
                 rangeFrom = this.humidityRange.start,
-                rangeTo = this.humidityRange.endInclusive
+                rangeTo = this.humidityRange.endInclusive,
+                runWithFan = runWithFan
             )
         }
         HumiditySettingsMode.Periodic -> {
             HumiditySettingsRequest(
                 mode = HumiditySettingsMode.Periodic.code,
                 waitPer = this.waitPer ?: 0,
-                runPer = this.runPer ?: 0
+                runPer = this.runPer ?: 0,
+                runWithFan = runWithFan
             )
         }
         HumiditySettingsMode.Manual -> {

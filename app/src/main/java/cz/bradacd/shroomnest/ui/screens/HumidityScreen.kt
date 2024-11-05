@@ -2,12 +2,14 @@ package cz.bradacd.shroomnest.ui.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -32,6 +34,7 @@ import cz.bradacd.shroomnest.ui.ManualSettings
 import cz.bradacd.shroomnest.ui.ModeSelector
 import cz.bradacd.shroomnest.ui.PeriodicSettings
 import cz.bradacd.shroomnest.viewmodel.HumidityViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun HumidityScreen(viewModel: HumidityViewModel = viewModel()) {
@@ -63,6 +66,7 @@ fun HumidityScreen(viewModel: HumidityViewModel = viewModel()) {
                     onHumidifierOnChange = { newValue -> viewModel.updateHumidifierOn(newValue) },
                     onWaitPerChange = { newValue -> viewModel.updateWaitPer(newValue) },
                     onRunPerChange = { newValue -> viewModel.updateRunPer(newValue) },
+                    onRunWithFanChange = { newValue -> viewModel.updateRunWithFan(newValue) },
                     pushIsLoading = pushIsLoading
                 )
             }
@@ -110,6 +114,7 @@ fun HumiditySettings.HumiditySettingsOptions(
     onHumidifierOnChange: (Boolean) -> Unit,
     onWaitPerChange: (Int?) -> Unit,
     onRunPerChange: (Int?) -> Unit,
+    onRunWithFanChange: (Boolean) -> Unit,
     pushIsLoading: Boolean
 ) {
     Column {
@@ -122,6 +127,7 @@ fun HumiditySettings.HumiditySettingsOptions(
 
         when (mode) {
             HumiditySettingsMode.Automatic -> {
+                FanSyncToggle(onRunWithFanChange)
                 AutomaticSettings(
                     onHumidityRangeChange = onHumidityRangeChange,
                     pushIsLoading = pushIsLoading
@@ -129,6 +135,7 @@ fun HumiditySettings.HumiditySettingsOptions(
             }
 
             HumiditySettingsMode.Periodic -> {
+                FanSyncToggle(onRunWithFanChange)
                 PeriodicSettings(
                     onWaitPerChange = onWaitPerChange,
                     onRunPerChange = onRunPerChange,
@@ -156,6 +163,37 @@ fun HumiditySettings.HumiditySettingsOptions(
                     ),
                 ) {
                     append(if (humidifierOn) "ON" else "OFF")
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun HumiditySettings.FanSyncToggle(onRunWithFanChange: (Boolean) -> Unit) {
+    Row {
+        Switch(
+            checked = runWithFan,
+            onCheckedChange = {
+                onRunWithFanChange(it)
+            }
+        )
+
+        Text(
+            text = "Fan parallel run: ",
+            modifier = Modifier.padding(top = 12.dp, start = 8.dp)
+        )
+
+        Text(
+            modifier = Modifier.padding(top = 12.dp),
+            text = buildAnnotatedString {
+                withStyle(
+                    style = SpanStyle(
+                        fontWeight = FontWeight.Bold,
+                        color = if (runWithFan) Color.Green else Color.Red
+                    ),
+                ) {
+                    append(if (runWithFan) "ON" else "OFF")
                 }
             }
         )

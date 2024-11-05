@@ -17,6 +17,7 @@ data class HumiditySettings(
     var humidifierOn: Boolean,
     var humidityRange: ClosedFloatingPointRange<Float>,
     var mode: HumiditySettingsMode,
+    var runWithFan: Boolean,
     override var waitPer: Int?,
     override var runPer: Int?,
     override var waitTime: Int,
